@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Define custom bases and symbols
+BASE_WATER="ewwatratewa"
+BASE_STIR="ti.itirtrtr"
+BASE_BESTCHOL="shtbeolhc"
+
+# Convert custom base number to decimal
+base_to_decimal() {
+    local number=$1
+    local base=$2
+    local decimal=0
+    local length=${#number}
+    local i
+
+    for ((i = 0; i < length; i++)); do
+        local digit=${number:i:1}
+        local value=$(echo "$base" | grep -b -o "$digit" | cut -d: -f1)
+        decimal=$((decimal * ${#base} + value))
+    done
+
+    echo $decimal
+}
+
+# Convert decimal number to custom base
+decimal_to_base() {
+    local decimal=$1
+    local base=$2
+    local result=""
+    local base_len=${#base}
+
+    while [ $decimal -gt 0 ]; do
+        local remainder=$((decimal % base_len))
+        result="${base:remainder:1}$result"
+        decimal=$((decimal / base_len))
+    done
+
+    echo ${result:-${base:0:1}}
+}
+
+# Get numbers from environment variables
+water_number=${WATER}
+stir_number=${STIR}
+
+# Convert to decimal
+water_decimal=$(base_to_decimal "$water_number" "$BASE_WATER")
+stir_decimal=$(base_to_decimal "$stir_number" "$BASE_STIR")
+
+# Add the numbers
+result_decimal=$((water_decimal + stir_decimal))
+
+# Convert result to target base
+result_base=$(decimal_to_base "$result_decimal" "$BASE_BESTCHOL")
+
+# Print the result
+echo "$result_base"
+
